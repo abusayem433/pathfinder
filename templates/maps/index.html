@@ -214,18 +214,28 @@
             'dijkstra': "Dijkstra's algorithm finds the shortest path considering edge weights.",
             'astar': 'A* uses heuristics to find the optimal path more efficiently than Dijkstra.'
         };
-        function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 12,
-                center: { lat: 23.7280, lng: 90.3979 },
-                mapTypeId: 'roadmap',
-                styles: [
-                    { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }
-                ]
-            });
-            loadNodesAndEdges();
-            initializeEventListeners();
-        }
+                 function initMap() {
+             console.log('initMap called, checking if map container exists...');
+             const mapContainer = document.getElementById('map');
+             if (!mapContainer) {
+                 console.error('Map container not found!');
+                 return;
+             }
+             console.log('Map container found, creating Google Map...');
+             
+             map = new google.maps.Map(mapContainer, {
+                 zoom: 12,
+                 center: { lat: 23.7280, lng: 90.3979 },
+                 mapTypeId: 'roadmap',
+                 styles: [
+                     { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }
+                 ]
+             });
+             
+             console.log('Google Map created, loading nodes and edges...');
+             loadNodesAndEdges();
+             initializeEventListeners();
+         }
         async function loadNodesAndEdges() {
             try {
                 const nodesResponse = await fetch('/api/nodes/');
@@ -301,14 +311,27 @@
          
          // Loader for Google Maps
          function loadGoogleMapsScript() {
+             console.log('Loading Google Maps script...');
              const script = document.createElement('script');
              script.src = 'https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}';
              script.async = true;
              script.defer = true;
-             script.onload = initMap;
-             document.body.appendChild(script);
+             script.onload = function() {
+                 console.log('Google Maps script loaded, initializing map...');
+                 initMap();
+             };
+             script.onerror = function() {
+                 console.error('Failed to load Google Maps script');
+             };
+             document.head.appendChild(script);
          }
-         window.onload = loadGoogleMapsScript;
+         
+         // Ensure DOM is ready before loading Google Maps
+         if (document.readyState === 'loading') {
+             document.addEventListener('DOMContentLoaded', loadGoogleMapsScript);
+         } else {
+             loadGoogleMapsScript();
+         }
     </script>
 </body>
 </html> 
