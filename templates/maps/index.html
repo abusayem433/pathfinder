@@ -199,9 +199,101 @@
     <!-- Custom JavaScript -->
     <script src="/static/js/pathfinder.js"></script>
     
-    <!-- Include Google Maps JavaScript API -->
-    <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap">
+    <!-- Inline Google Maps initMap and loader -->
+    <script>
+        // Global variables
+        let map;
+        let nodes = [];
+        let edges = [];
+        let markers = [];
+        let pathPolyline = null;
+        let edgePolylines = [];
+        const algorithmDescriptions = {
+            'bfs': 'BFS explores nodes level by level, guaranteeing the shortest path in unweighted graphs.',
+            'dfs': 'DFS explores as far as possible along each branch before backtracking.',
+            'dijkstra': "Dijkstra's algorithm finds the shortest path considering edge weights.",
+            'astar': 'A* uses heuristics to find the optimal path more efficiently than Dijkstra.'
+        };
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 12,
+                center: { lat: 23.7280, lng: 90.3979 },
+                mapTypeId: 'roadmap',
+                styles: [
+                    { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }
+                ]
+            });
+            loadNodesAndEdges();
+            initializeEventListeners();
+        }
+        async function loadNodesAndEdges() {
+            try {
+                const nodesResponse = await fetch('/api/nodes/');
+                const nodesData = await nodesResponse.json();
+                nodes = nodesData.nodes;
+                const edgesResponse = await fetch('/api/edges/');
+                const edgesData = await edgesResponse.json();
+                edges = edgesData.edges;
+                displayNodesOnMap();
+                displayEdgesOnMap();
+                adjustMapBounds();
+            } catch (error) { console.error('Error loading map data', error); }
+        }
+        function displayNodesOnMap() {
+            nodes.forEach(node => {
+                const marker = new google.maps.Marker({
+                    position: { lat: node.latitude, lng: node.longitude },
+                    map: map,
+                    title: node.name,
+                    icon: { url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png', scaledSize: new google.maps.Size(32, 32) }
+                });
+                const infoWindow = new google.maps.InfoWindow({
+                    content: `<div><h6>${node.name}</h6><p><small>${node.description || 'No description available'}</small></p><p><small>Coordinates: ${node.latitude.toFixed(4)}, ${node.longitude.toFixed(4)}</small></p></div>`
+                });
+                marker.addListener('click', () => { infoWindow.open(map, marker); });
+                markers.push({ marker, node });
+            });
+        }
+        function displayEdgesOnMap() {
+            edges.forEach(edge => {
+                const path = [
+                    { lat: edge.from_node.latitude, lng: edge.from_node.longitude },
+                    { lat: edge.to_node.latitude, lng: edge.to_node.longitude }
+                ];
+                const polyline = new google.maps.Polyline({
+                    path: path, geodesic: true, strokeColor: '#9e9e9e', strokeOpacity: 0.6, strokeWeight: 2
+                });
+                polyline.setMap(map);
+                edgePolylines.push(polyline);
+            });
+        }
+        function adjustMapBounds() {
+            if (nodes.length === 0) return;
+            const bounds = new google.maps.LatLngBounds();
+            nodes.forEach(node => { bounds.extend(new google.maps.LatLng(node.latitude, node.longitude)); });
+            map.fitBounds(bounds);
+            google.maps.event.addListenerOnce(map, 'bounds_changed', () => { if (map.getZoom() > 15) map.setZoom(15); });
+        }
+        function initializeEventListeners() {
+            document.getElementById('algorithm').addEventListener('change', function() {
+                const algorithm = this.value;
+                document.getElementById('algorithmInfo').textContent = algorithmDescriptions[algorithm];
+            });
+            document.getElementById('findPathBtn').addEventListener('click', findPath);
+            document.getElementById('clearPathBtn').addEventListener('click', clearPath);
+            document.getElementById('compareAlgorithmsBtn').addEventListener('click', compareAlgorithms);
+        }
+        // The rest of your pathfinder.js functions (findPath, displayPath, etc.) remain in the static file
+        // Loader for Google Maps
+        function loadGoogleMapsScript() {
+            const script = document.createElement('script');
+            script.src = 'https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}';
+            script.async = true;
+            script.defer = true;
+            script.onload = initMap;
+            document.body.appendChild(script);
+        }
+        window.onload = loadGoogleMapsScript;
     </script>
 </body>
 </html> 
