@@ -141,52 +141,6 @@ function adjustMapBounds() {
     });
 }
 
-// Adjust map bounds to focus on the found path
-function adjustMapBoundsToPath(pathNodes) {
-    if (!pathNodes || pathNodes.length === 0) return;
-    
-    console.log('🎯 Auto-zooming to path with', pathNodes.length, 'nodes');
-    
-    const bounds = new google.maps.LatLngBounds();
-    
-    // Add all path nodes to bounds
-    pathNodes.forEach(node => {
-        bounds.extend(new google.maps.LatLng(node.latitude, node.longitude));
-    });
-    
-    // Calculate center of the path for smooth animation
-    const center = bounds.getCenter();
-    
-    // First, smoothly pan to the center of the path
-    map.panTo(center);
-    
-    // Then fit the bounds with padding and animation
-    setTimeout(() => {
-        const padding = {
-            top: 60,
-            right: 60,
-            bottom: 80,
-            left: 60
-        };
-        
-        map.fitBounds(bounds, padding);
-        
-        // Set zoom limits for path view
-        google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
-            const zoom = map.getZoom();
-            
-            // Ensure zoom level is appropriate for path viewing
-            if (zoom > 16) {
-                map.setZoom(16); // Don't zoom too close
-            } else if (zoom < 10) {
-                map.setZoom(10); // Don't zoom too far out
-            }
-            
-            console.log('✅ Map zoomed to path, zoom level:', map.getZoom());
-        });
-    }, 500); // Small delay for smooth transition
-}
-
 // Initialize event listeners
 function initializeEventListeners() {
     console.log('🔧 Setting up event listeners...');
@@ -306,9 +260,6 @@ function displayPath(data) {
             });
         }
     });
-    
-    // Auto-zoom to fit the path with some padding
-    adjustMapBoundsToPath(data.path);
 }
 
 // Update marker colors for start and end nodes
@@ -471,47 +422,29 @@ function clearPath() {
     // Hide results panels
     document.getElementById('resultsPanel').style.display = 'none';
     document.getElementById('comparisonPanel').style.display = 'none';
-    
-    // Zoom back out to show all nodes
-    console.log('🔄 Zooming back to show all nodes');
-    adjustMapBounds();
 }
 
-// Show floating alert messages
+// Show alert messages
 function showAlert(message, type) {
     // Remove existing alerts
-    const existingAlerts = document.querySelectorAll('.floating-alert');
+    const existingAlerts = document.querySelectorAll('.alert');
     existingAlerts.forEach(alert => alert.remove());
     
-    // Create new floating alert
+    // Create new alert
     const alertDiv = document.createElement('div');
-    alertDiv.className = `floating-alert alert-${type}`;
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
     alertDiv.innerHTML = `
-        <div class="alert-content">
-            <span class="alert-message">${message}</span>
-            <button type="button" class="alert-close" onclick="this.parentElement.parentElement.remove()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
     
-    // Add to body (floating on top)
-    document.body.appendChild(alertDiv);
-    
-    // Trigger slide-in animation
-    setTimeout(() => {
-        alertDiv.classList.add('show');
-    }, 10);
+    // Insert at the top of the page
+    document.querySelector('.container-fluid').insertBefore(alertDiv, document.querySelector('.row'));
     
     // Auto-dismiss after 5 seconds
     setTimeout(() => {
         if (alertDiv.parentNode) {
-            alertDiv.classList.add('hide');
-            setTimeout(() => {
-                if (alertDiv.parentNode) {
-                    alertDiv.remove();
-                }
-            }, 300); // Wait for slide-out animation
+            alertDiv.remove();
         }
     }, 5000);
 } 
