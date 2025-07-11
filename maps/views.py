@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
+from django.middleware.csrf import get_token
 import json
 from .models import Node, Edge
 from .algorithms import PathfindingAlgorithms
@@ -13,6 +14,7 @@ def index(request):
     context = {
         'nodes': nodes,
         'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
+        'csrf_token': get_token(request),
     }
     return render(request, 'maps/index.html', context)
 

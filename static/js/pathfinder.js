@@ -190,7 +190,7 @@ async function findPath() {
     document.getElementById('findPathBtn').disabled = true;
     
     try {
-        const response = await fetch('/api/find-path/', {
+        const response = await (window.fetchWithCSRF || fetch)('/api/find-path/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -333,7 +333,7 @@ async function compareAlgorithms() {
     
     try {
         for (const algorithm of algorithms) {
-            const response = await fetch('/api/find-path/', {
+            const response = await (window.fetchWithCSRF || fetch)('/api/find-path/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

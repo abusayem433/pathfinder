@@ -283,17 +283,32 @@
             document.getElementById('clearPathBtn').addEventListener('click', clearPath);
             document.getElementById('compareAlgorithmsBtn').addEventListener('click', compareAlgorithms);
         }
-        // The rest of your pathfinder.js functions (findPath, displayPath, etc.) remain in the static file
-        // Loader for Google Maps
-        function loadGoogleMapsScript() {
-            const script = document.createElement('script');
-            script.src = 'https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}';
-            script.async = true;
-            script.defer = true;
-            script.onload = initMap;
-            document.body.appendChild(script);
-        }
-        window.onload = loadGoogleMapsScript;
+                 // Enhanced fetch function with CSRF token
+         function fetchWithCSRF(url, options = {}) {
+             const csrfToken = '{{ csrf_token }}';
+             return fetch(url, {
+                 ...options,
+                 headers: {
+                     ...options.headers,
+                     'X-CSRFToken': csrfToken,
+                     'Content-Type': 'application/json',
+                 },
+             });
+         }
+         
+         // Override the fetch functions to use CSRF
+         window.fetchWithCSRF = fetchWithCSRF;
+         
+         // Loader for Google Maps
+         function loadGoogleMapsScript() {
+             const script = document.createElement('script');
+             script.src = 'https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}';
+             script.async = true;
+             script.defer = true;
+             script.onload = initMap;
+             document.body.appendChild(script);
+         }
+         window.onload = loadGoogleMapsScript;
     </script>
 </body>
 </html> 
