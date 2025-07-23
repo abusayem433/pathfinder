@@ -16,6 +16,12 @@ You can directly explore the live demo of this project here:
 
 No setup required—just visit the link and try out the pathfinding features in your browser!
 
+## Public Repository
+
+You can also view the full source code, report issues, or contribute to this project on GitHub:
+
+👉 [https://github.com/abusayem433/pathfinder](https://github.com/abusayem433/pathfinder)
+
 ## Setup Instructions
 
 1. **Open a terminal and navigate to the project folder:**
