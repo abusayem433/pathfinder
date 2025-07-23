@@ -1,3 +1,4 @@
+# Import necessary Django and project modules
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.conf import settings
@@ -10,24 +11,23 @@ from .algorithms import PathfindingAlgorithms
 
 def index(request):
     """Main page with Google Maps integration"""
+    # Fetch all nodes from the database
     nodes = Node.objects.all()
+    # Prepare context for rendering the template
     context = {
         'nodes': nodes,
         'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
         'csrf_token': get_token(request),
     }
+    # Render the main index page
     return render(request, 'maps/index.html', context)
 
 
-def debug_maps(request):
-    """Debug page to test Google Maps loading"""
-    context = {
-        'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
-    }
-    return render(request, 'maps/debug.html', context)
-
-
 @csrf_exempt
+# API endpoint to find a path between two nodes using a selected algorithm
+# Accepts POST requests with start_id, end_id, and algorithm
+# Returns path details and performance metrics as JSON
+
 def find_path_api(request):
     """API endpoint for pathfinding"""
     if request.method == 'POST':
@@ -53,6 +53,7 @@ def find_path_api(request):
                         'longitude': node.longitude
                     })
                 
+                # Return path and metrics as JSON
                 return JsonResponse({
                     'success': True,
                     'path': path_nodes,
@@ -63,19 +64,25 @@ def find_path_api(request):
                     'algorithm': result['algorithm']
                 })
             else:
+                # No path found
                 return JsonResponse({
                     'success': False,
                     'error': 'No path found between the selected nodes'
                 })
         
         except Exception as e:
+            # Handle errors and return as JSON
             return JsonResponse({
                 'success': False,
                 'error': str(e)
             })
     
+    # Only POST requests are allowed
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
+
+# API endpoint to get all nodes in the graph
+# Returns a list of nodes with their details as JSON
 
 def get_nodes_api(request):
     """API endpoint to get all nodes"""
@@ -93,6 +100,9 @@ def get_nodes_api(request):
     
     return JsonResponse({'nodes': nodes_data})
 
+
+# API endpoint to get all edges in the graph
+# Returns a list of edges with node details and weights as JSON
 
 def get_edges_api(request):
     """API endpoint to get all edges"""
