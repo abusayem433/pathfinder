@@ -7,10 +7,8 @@ class Node(models.Model):
     name = models.CharField(max_length=100)  # Name of the node/location
     latitude = models.FloatField()           # Latitude coordinate
     longitude = models.FloatField()          # Longitude coordinate
-    description = models.TextField(blank=True)  # Optional description
     
     def __str__(self):
-        # String representation for admin and debugging
         return self.name
     
     class Meta:
@@ -25,7 +23,6 @@ class Edge(models.Model):
     weight = models.FloatField(default=1.0)  # Distance or cost of the edge
     
     def __str__(self):
-        # String representation for admin and debugging
         return f"{self.from_node.name} -> {self.to_node.name} (Weight: {self.weight})"
     
     class Meta:

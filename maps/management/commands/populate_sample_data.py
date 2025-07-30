@@ -81,8 +81,7 @@ class Command(BaseCommand):
             node = Node.objects.create(
                 name=node_data['name'],
                 latitude=node_data['lat'],
-                longitude=node_data['lng'],
-                description=node_data['desc']
+                longitude=node_data['lng']
             )
             created_nodes.append(node)
             self.stdout.write(f"Created node: {node.name}")

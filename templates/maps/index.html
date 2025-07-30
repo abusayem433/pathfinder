@@ -359,27 +359,17 @@
          
                   // Loader for Google Maps
          function loadGoogleMapsScript() {
-             console.log('🔄 Loading Google Maps script...');
-             console.log('🔑 API Key present:', '{{ google_maps_api_key }}' ? 'YES' : 'NO');
-             console.log('🔑 API Key length:', '{{ google_maps_api_key }}'.length);
-             
              const script = document.createElement('script');
              script.src = 'https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}';
              script.async = true;
              script.defer = true;
              script.onload = function() {
-                 console.log('✅ Google Maps script loaded successfully');
                  // Call initMap from pathfinder.js after Google Maps loads
                  if (window.initMap && typeof window.initMap === 'function') {
-                     console.log('🚀 Calling initMap from pathfinder.js...');
                      window.initMap();
-                 } else {
-                     console.error('❌ initMap function not found in pathfinder.js');
                  }
              };
              script.onerror = function(error) {
-                 console.error('❌ Failed to load Google Maps script:', error);
-                 console.error('🔗 Script URL:', script.src);
                  document.getElementById('map').innerHTML = `
                      <div style="padding: 20px; background: #ffebee; border: 1px solid #f44336; border-radius: 8px; text-align: center;">
                          <h5 style="color: #d32f2f;">⚠️ Google Maps Failed to Load</h5>
@@ -393,13 +383,10 @@
          
          // Ensure DOM is ready before loading Google Maps
          if (document.readyState === 'loading') {
-             console.log('⏳ DOM still loading, waiting...');
              document.addEventListener('DOMContentLoaded', function() {
-                 console.log('✅ DOM ready, loading Google Maps...');
                  loadGoogleMapsScript();
              });
          } else {
-             console.log('✅ DOM already ready, loading Google Maps immediately...');
              loadGoogleMapsScript();
          }
     </script>

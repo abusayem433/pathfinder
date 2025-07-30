@@ -94,8 +94,7 @@ def get_nodes_api(request):
             'id': node.id,
             'name': node.name,
             'latitude': node.latitude,
-            'longitude': node.longitude,
-            'description': node.description
+            'longitude': node.longitude
         })
     
     return JsonResponse({'nodes': nodes_data})

@@ -16,8 +16,6 @@ const algorithmDescriptions = {
 
 // Initialize Google Maps
 function initMap() {
-    console.log('🚀 initMap called - Google Maps loading...');
-    
     // Center map on Dhaka, Bangladesh
     map = new google.maps.Map(document.getElementById('map'), {
         zoom: 12,
@@ -32,15 +30,11 @@ function initMap() {
         ]
     });
 
-    console.log('✅ Google Maps created successfully');
-
     // Load nodes and edges
     loadNodesAndEdges();
     
     // Initialize event listeners
     initializeEventListeners();
-    
-    console.log('🎯 Map initialization complete');
 }
 
 // Load nodes and edges from the backend
@@ -64,7 +58,6 @@ async function loadNodesAndEdges() {
         adjustMapBounds();
         
     } catch (error) {
-        console.error('Error loading nodes and edges:', error);
         showAlert('Error loading map data', 'danger');
     }
 }
@@ -87,7 +80,6 @@ function displayNodesOnMap() {
             content: `
                 <div>
                     <h6>${node.name}</h6>
-                    <p><small>${node.description || 'No description available'}</small></p>
                     <p><small>Coordinates: ${node.latitude.toFixed(4)}, ${node.longitude.toFixed(4)}</small></p>
                 </div>
             `
@@ -145,8 +137,6 @@ function adjustMapBounds() {
 function adjustMapBoundsToPath(pathNodes) {
     if (!pathNodes || pathNodes.length === 0) return;
     
-    console.log('🎯 Auto-zooming to path with', pathNodes.length, 'nodes');
-    
     const bounds = new google.maps.LatLngBounds();
     
     // Add all path nodes to bounds
@@ -181,16 +171,12 @@ function adjustMapBoundsToPath(pathNodes) {
             } else if (zoom < 10) {
                 map.setZoom(10); // Don't zoom too far out
             }
-            
-            console.log('✅ Map zoomed to path, zoom level:', map.getZoom());
         });
     }, 500); // Small delay for smooth transition
 }
 
 // Initialize event listeners
 function initializeEventListeners() {
-    console.log('🔧 Setting up event listeners...');
-    
     // Algorithm selection change
     document.getElementById('algorithm').addEventListener('change', function() {
         const algorithm = this.value;
@@ -199,29 +185,21 @@ function initializeEventListeners() {
     
     // Find path button
     document.getElementById('findPathBtn').addEventListener('click', findPath);
-    console.log('✅ Find Path button listener added');
     
     // Clear path button
     document.getElementById('clearPathBtn').addEventListener('click', clearPath);
     
     // Compare algorithms button
     document.getElementById('compareAlgorithmsBtn').addEventListener('click', compareAlgorithms);
-    
-    console.log('✅ All event listeners initialized');
 }
 
 // Find path using selected algorithm
 async function findPath() {
-    console.log('🔍 Find Path button clicked!');
-    
     const startId = document.getElementById('startNode').value;
     const endId = document.getElementById('endNode').value;
     const algorithm = document.getElementById('algorithm').value;
     
-    console.log('📊 Selected values:', { startId, endId, algorithm });
-    
     if (!startId || !endId) {
-        console.log('⚠️ Missing source or destination');
         showAlert('Please select both source and destination nodes', 'warning');
         return;
     }
@@ -259,7 +237,6 @@ async function findPath() {
         }
         
     } catch (error) {
-        console.error('Error finding path:', error);
         showAlert('Error occurred while finding path', 'danger');
     } finally {
         // Hide loading
@@ -404,7 +381,6 @@ async function compareAlgorithms() {
         showAlert('Algorithm comparison completed!', 'info');
         
     } catch (error) {
-        console.error('Error comparing algorithms:', error);
         showAlert('Error occurred during comparison', 'danger');
     } finally {
         // Hide loading
@@ -473,7 +449,6 @@ function clearPath() {
     document.getElementById('comparisonPanel').style.display = 'none';
     
     // Zoom back out to show all nodes
-    console.log('🔄 Zooming back to show all nodes');
     adjustMapBounds();
 }
 
